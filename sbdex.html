@@ -1,0 +1,857 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>六八班 · 整活官网</title>
+    <style>
+        /* ============================================================
+               全局重置 · 高级感基础
+               ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f7;
+            font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            color: #1e2a3a;
+            padding: 40px 24px 60px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ============================================================
+               主容器 · 毛玻璃质感
+               ============================================================ */
+        .app {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.70);
+            backdrop-filter: blur(24px) saturate(1.4);
+            -webkit-backdrop-filter: blur(24px) saturate(1.4);
+            border-radius: 40px;
+            box-shadow:
+                0 20px 60px -12px rgba(0, 20, 40, 0.18),
+                0 4px 24px -6px rgba(0, 20, 40, 0.06);
+            padding: 40px 44px 48px;
+            border: 1px solid rgba(255, 255, 255, 0.60);
+            transition: all 0.2s;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 16px 12px 40px;
+            }
+            .app {
+                padding: 24px 18px 32px;
+                border-radius: 28px;
+            }
+        }
+
+        /* ============================================================
+               顶部 · 导航栏风格
+               ============================================================ */
+        .nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            margin-bottom: 32px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand .logo-icon {
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .nav-brand .brand-text {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #1a2634;
+        }
+
+        .nav-brand .brand-text span {
+            color: #3b7bc9;
+        }
+
+        .nav-tag {
+            font-size: 13px;
+            color: #6b7a8f;
+            background: rgba(59, 123, 201, 0.08);
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-weight: 450;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(59, 123, 201, 0.10);
+        }
+
+        /* ============================================================
+               欢迎块 · 克制幽默
+               ============================================================ */
+        .hero-block {
+            margin-bottom: 34px;
+            padding: 18px 0 6px;
+        }
+
+        .hero-block .hero-text {
+            font-size: 18px;
+            color: #2c3e50;
+            font-weight: 440;
+            letter-spacing: 0.2px;
+            line-height: 1.7;
+        }
+
+        .hero-block .hero-text .accent {
+            color: #3b7bc9;
+            font-weight: 550;
+        }
+
+        .hero-block .hero-text .highlight-box {
+            display: inline-block;
+            background: rgba(59, 123, 201, 0.06);
+            padding: 0 14px;
+            border-radius: 30px;
+            font-weight: 500;
+            color: #1a2a3a;
+        }
+
+        .hero-block .hero-text .big-laugh {
+            font-size: 28px;
+            font-weight: 700;
+            color: #c0392b;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .hero-block .hero-sub {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #7a8a9e;
+            border-left: 3px solid rgba(59, 123, 201, 0.25);
+            padding-left: 16px;
+        }
+
+        /* ============================================================
+               卡片通用
+               ============================================================ */
+        .card {
+            background: rgba(255, 255, 255, 0.60);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 28px 30px 32px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.70);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+            transition: box-shadow 0.25s;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 30px -8px rgba(0, 20, 40, 0.08);
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1e2a3a;
+            letter-spacing: -0.2px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .badge {
+            font-size: 12px;
+            font-weight: 450;
+            background: rgba(59, 123, 201, 0.08);
+            color: #3b7bc9;
+            padding: 0 14px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ============================================================
+               图片画廊
+               ============================================================ */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .gallery-grid .g-item {
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .gallery-grid .g-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px -8px rgba(0, 20, 40, 0.10);
+        }
+
+        .gallery-grid .g-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #f5f7fa;
+        }
+
+        .gallery-grid .g-item .g-label {
+            padding: 8px 12px 10px;
+            font-size: 13px;
+            color: #4a5a6e;
+            background: #fafcff;
+            border-top: 1px solid #f0f3f8;
+            font-weight: 450;
+            word-break: break-all;
+        }
+
+        .gallery-grid .g-item .g-label .pin {
+            color: #3b7bc9;
+            font-weight: 550;
+            margin-right: 4px;
+        }
+
+        /* 图片下方脚注 */
+        .gallery-footnote {
+            margin-top: 18px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.50);
+            border-radius: 18px;
+            font-size: 14px;
+            color: #3d4e62;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 18px;
+        }
+
+        .gallery-footnote .dot {
+            color: #b0c0d0;
+            font-weight: 300;
+        }
+
+        .gallery-footnote .ft-accent {
+            color: #c0392b;
+            font-weight: 500;
+        }
+
+        /* ============================================================
+               下载专区 · 双列卡片
+               ============================================================ */
+        .download-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        @media (max-width: 560px) {
+            .download-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .download-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 22px 24px 26px;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .download-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px -12px rgba(0, 20, 40, 0.12);
+        }
+
+        .download-card .d-icon {
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        .download-card .d-icon img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            border-radius: 16px;
+            background: #f5f8fc;
+            padding: 6px;
+            border: 1px solid #eaf0f6;
+        }
+
+        .download-card .d-desc {
+            font-size: 15px;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .download-card .d-desc .hl {
+            color: #3b7bc9;
+            font-weight: 550;
+        }
+
+        .download-card .d-desc a {
+            color: #1a5c9e;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dashed rgba(26, 92, 158, 0.25);
+            transition: border-color 0.2s;
+        }
+
+        .download-card .d-desc a:hover {
+            border-bottom-color: #1a5c9e;
+        }
+
+        .download-card .d-sub {
+            font-size: 13px;
+            color: #8a9aaa;
+            margin-top: 6px;
+        }
+
+        /* ============================================================
+               雷霆表情展区
+               ============================================================ */
+        .thunder-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .thunder-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .thunder-item {
+            background: #ffffff;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
+        }
+
+        .thunder-item:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 10px 28px -10px rgba(0, 20, 40, 0.10);
+        }
+
+        .thunder-item img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            display: block;
+            background: #f5f7fa;
+        }
+
+        .thunder-item .t-label {
+            padding: 8px 10px 10px;
+            font-size: 13px;
+            color: #4a5a6e;
+            text-align: center;
+            background: #fafcff;
+            border-top: 1px solid #f0f3f8;
+            font-weight: 450;
+            letter-spacing: 0.3px;
+        }
+
+        .thunder-footer {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 14px;
+            color: #8a9aaa;
+            letter-spacing: 0.5px;
+            font-weight: 420;
+        }
+
+        /* ============================================================
+               鬼新娘 · 歌词卡（高级暗调）
+               ============================================================ */
+        .ghost-card {
+            background: rgba(22, 26, 38, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 32px;
+            padding: 32px 34px 38px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.30);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ghost-card::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 360px;
+            height: 360px;
+            background: radial-gradient(circle, rgba(100, 70, 160, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .ghost-card::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -10%;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(60, 40, 120, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .ghost-header {
+            text-align: center;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ghost-header .gh-title {
+            font-size: 20px;
+            font-weight: 550;
+            color: #d4c8e8;
+            letter-spacing: 2px;
+        }
+
+        .ghost-header .gh-sub {
+            font-size: 13px;
+            color: #6a5a7a;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .ghost-header .gh-divider {
+            width: 56px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #7a5a8a, transparent);
+            margin: 12px auto 0;
+        }
+
+        .ghost-avatar {
+            text-align: center;
+            margin: 6px 0 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ghost-avatar img {
+            width: 104px;
+            height: 104px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #4a3a5a;
+            box-shadow: 0 0 40px rgba(80, 50, 120, 0.20);
+            background: #1a1a24;
+            transition: transform 0.3s;
+        }
+
+        .ghost-avatar img:hover {
+            transform: scale(1.04);
+        }
+
+        .ghost-lyrics {
+            font-family: "SF Mono", "Courier New", "PingFang SC", monospace;
+            line-height: 2.0;
+            font-size: 15px;
+            color: #ccc8d8;
+            text-align: center;
+            white-space: pre-wrap;
+            word-break: break-word;
+            position: relative;
+            z-index: 1;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+            letter-spacing: 0.3px;
+        }
+
+        .ghost-lyrics::-webkit-scrollbar {
+            width: 4px;
+        }
+        .ghost-lyrics::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        .ghost-lyrics::-webkit-scrollbar-thumb {
+            background: #4a3a5a;
+            border-radius: 10px;
+        }
+
+        .ghost-lyrics .l-moon {
+            color: #c8bce0;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .ghost-lyrics .l-ghost {
+            color: #b0a0c0;
+        }
+
+        .ghost-lyrics .l-eye {
+            color: #d8cce8;
+            font-weight: 480;
+        }
+
+        .ghost-lyrics .l-heart {
+            color: #c0a8d0;
+        }
+
+        .ghost-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #4a3a5a;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.8px;
+        }
+
+        .ghost-footer span {
+            color: #6a5a7a;
+        }
+
+        @media (max-width: 640px) {
+            .ghost-card {
+                padding: 22px 18px 28px;
+                border-radius: 24px;
+            }
+            .ghost-lyrics {
+                font-size: 14px;
+                line-height: 1.9;
+                max-height: 360px;
+            }
+            .ghost-avatar img {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        /* ============================================================
+               页脚
+               ============================================================ */
+        .site-footer {
+            margin-top: 28px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+            text-align: center;
+            font-size: 13px;
+            color: #8a9aaa;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================================
+               工具
+               ============================================================ */
+        .mt-1 {
+            margin-top: 6px;
+        }
+        .mb-1 {
+            margin-bottom: 6px;
+        }
+        .text-muted {
+            color: #8a9aaa;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+
+        <!-- ============================================================
+        导航栏
+        ============================================================ -->
+        <header class="nav-bar">
+            <div class="nav-brand">
+                <span class="logo-icon">📚</span>
+                <span class="brand-text">六八班<span>·</span>整活</span>
+            </div>
+            <span class="nav-tag">社会你杨哥 · 人智网页说</span>
+        </header>
+
+        <!-- ============================================================
+        Hero · 欢迎整活
+        ============================================================ -->
+        <section class="hero-block">
+            <div class="hero-text">
+                <span class="accent">来致障：</span>
+                当你看到这个网站时，无论你是肖颖枫还是许皓轩还是其他人，
+                <span class="highlight-box">你已经被骗了。</span>
+                <span style="font-size:22px; margin-left:4px;">😂</span>
+                <br />
+                <span class="big-laugh">哈哈哈哈哈哈哈哈哈哈哈你猪吧</span>
+            </div>
+            <div class="hero-sub">
+                ⚡ 本站内容仅供娱乐 · 如有雷同纯属糖入
+            </div>
+        </section>
+
+        <!-- ============================================================
+        图片画廊
+        ============================================================ -->
+        <section class="card">
+            <div class="card-title">
+                🖼️ 图库
+                <span class="badge">整活精选</span>
+            </div>
+
+            <div class="gallery-grid">
+                <!-- lai.jpg -->
+                <div class="g-item">
+                    <img src="lai.jpg" alt="lai" />
+                    <div class="g-label"><span class="pin">📷</span> lai.jpg</div>
+                </div>
+                <!-- 炉管是错误行为。他就要明白、.png -->
+                <div class="g-item">
+                    <img src="炉管是错误行为。他就要明白、.png" alt="炉管是错误行为。他就要明白、" />
+                    <div class="g-label"><span class="pin">📷</span> 炉管是错误行为。他就要明白、</div>
+                </div>
+                <!-- ？.jpg -->
+                <div class="g-item">
+                    <img src="？.jpg" alt="？" />
+                    <div class="g-label"><span class="pin">📷</span> ？.jpg</div>
+                </div>
+                <!-- 明月吐光.png -->
+                <div class="g-item">
+                    <img src="明月吐光.png" alt="明月吐光" />
+                    <div class="g-label"><span class="pin">📷</span> 明月吐光.png</div>
+                </div>
+                <!-- 梁巴昆.jpg -->
+                <div class="g-item">
+                    <img src="梁巴昆.jpg" alt="梁巴昆" />
+                    <div class="g-label"><span class="pin">📷</span> 梁巴昆.jpg</div>
+                </div>
+                <!-- 炉管是错误行为。他就要明白、.png 第二次 -->
+                <div class="g-item">
+                    <img src="炉管是错误行为。他就要明白、.png" alt="炉管是错误行为。他就要明白、" />
+                    <div class="g-label"><span class="pin">📷</span> 炉管是错误行为。他就要明白、</div>
+                </div>
+            </div>
+
+            <div class="gallery-footnote">
+                <span><span class="ft-accent">骂人是错误行为。</span> 他就要明白、</span>
+                <span class="dot">|</span>
+                <span><span class="ft-accent">不听不听王八念经</span></span>
+                <span class="dot">|</span>
+                <span><span class="ft-accent">炉管是错误行为。</span> 他就也要明白、</span>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        下载专区
+        ============================================================ -->
+        <section class="card">
+            <div class="card-title">
+                📦 下载专区
+                <span class="badge">整活出品</span>
+            </div>
+
+            <div class="download-grid">
+                <!-- 电脑安装包 -->
+                <div class="download-card">
+                    <a href="猜数字1.0.0.3安装包.exe" class="d-icon">
+                        <img src="猜数字图标2.ico" alt="猜数字图标2" />
+                    </a>
+                    <div class="d-desc">
+                        <span class="hl">我是大狗，</span>
+                        <a href="猜数字1.0.0.3安装包.exe">点击我下载猜数字电脑安装包</a>
+                    </div>
+                </div>
+
+                <!-- 网页版 -->
+                <div class="download-card">
+                    <a href="大狗猜数字最新版.html" class="d-icon">
+                        <img src="猜数字图标.ico" alt="猜数字图标" />
+                    </a>
+                    <div class="d-desc">
+                        <span class="hl">我也是大狗，</span>
+                        <a href="大狗猜数字最新版.html">如果是手机可以点击我玩网页版的猜数字</a>
+                        <div class="d-sub">（有些地方有bug）</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        雷霆表情展区
+        ============================================================ -->
+        <section class="card">
+            <div class="card-title">
+                ⚡ 雷霆表情展区
+                <span class="badge">不不不我无疑是愤怒的</span>
+            </div>
+
+            <div class="thunder-grid">
+                <div class="thunder-item">
+                    <img src="雷霆表情（白背景）/1.jpg" alt="雷霆表情 1" />
+                    <div class="t-label">⚡ #1</div>
+                </div>
+                <div class="thunder-item">
+                    <img src="雷霆表情（白背景）/2.jpg" alt="雷霆表情 2" />
+                    <div class="t-label">⚡ #2</div>
+                </div>
+                <div class="thunder-item">
+                    <img src="雷霆表情（白背景）/3.jpg" alt="雷霆表情 3" />
+                    <div class="t-label">⚡ #3</div>
+                </div>
+                <div class="thunder-item">
+                    <img src="雷霆表情（白背景）/4.jpg" alt="雷霆表情 4" />
+                    <div class="t-label">⚡ #4</div>
+                </div>
+                <div class="thunder-item">
+                    <img src="雷霆表情（白背景）/5.jpg" alt="雷霆表情 5" />
+                    <div class="t-label">⚡ #5</div>
+                </div>
+                <div class="thunder-item">
+                    <img src="雷霆表情（白背景）/6.jpg" alt="雷霆表情 6" />
+                    <div class="t-label">⚡ #6</div>
+                </div>
+                <div class="thunder-item">
+                    <img src="雷霆表情（白背景）/7.jpg" alt="雷霆表情 7" />
+                    <div class="t-label">⚡ #7</div>
+                </div>
+                <div class="thunder-item">
+                    <img src="雷霆表情（白背景）/8.jpg" alt="雷霆表情 8" />
+                    <div class="t-label">⚡ #8</div>
+                </div>
+            </div>
+
+            <div class="thunder-footer">
+                ⚡ 十八码 · 老牧师 ⚡
+            </div>
+        </section>
+
+        <!-- ============================================================
+        鬼新娘 · 午夜电台（歌词卡）
+        ============================================================ -->
+        <section class="ghost-card">
+
+            <div class="ghost-header">
+                <div class="gh-title">🌙 好听的</div>
+                <div class="gh-sub">🎵 如果你不出盒马来致远将在半夜唱这首歌</div>
+                <div class="gh-divider"></div>
+            </div>
+
+            <div class="ghost-avatar">
+                <img src="林正英.png" alt="林正英" />
+            </div>
+
+            <div class="ghost-lyrics">
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+
+                <span class="l-ghost">明月吐光</span>
+                <span class="l-ghost">阴风吹柳巷</span>
+                <span class="l-ghost">是女鬼觅爱郎</span>
+                <span class="l-ghost">谁人愿爱</span>
+                <span class="l-ghost">凄厉鬼新娘</span>
+                <span class="l-ghost">陪伴女鬼</span>
+                <span class="l-ghost">深宵偷拜月光</span>
+
+                <span class="l-ghost">明月吐光</span>
+                <span class="l-ghost">冤鬼风里荡</span>
+                <span class="l-ghost">夜更深雾更寒</span>
+                <span class="l-ghost">游魂踏遍</span>
+                <span class="l-ghost">幽寂路上</span>
+                <span class="l-ghost">寻觅替身</span>
+                <span class="l-ghost">阴风吹冷月光</span>
+
+                <span class="l-eye">她的眼光</span>
+                <span class="l-eye">她的眼光</span>
+                <span class="l-eye">好似好似星星发光</span>
+                <span class="l-heart">睇见 睇见</span>
+                <span class="l-heart">睇见 睇见</span>
+                <span class="l-heart">心慌慌</span>
+
+                <span class="l-eye">她的眼光</span>
+                <span class="l-eye">她的眼光</span>
+                <span class="l-eye">好似好似星星发光</span>
+                <span class="l-heart">睇见 睇见</span>
+                <span class="l-heart">睇见 心更慌</span>
+
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+
+                <span class="l-ghost">明月吐光</span>
+                <span class="l-ghost">冤鬼风里荡</span>
+                <span class="l-ghost">夜更深雾更寒</span>
+                <span class="l-ghost">游魂踏遍</span>
+                <span class="l-ghost">幽寂路上</span>
+                <span class="l-ghost">寻觅替身</span>
+                <span class="l-ghost">阴风吹冷月光</span>
+
+                <span class="l-eye">她的眼光</span>
+                <span class="l-eye">她的眼光</span>
+                <span class="l-eye">好似好似星星发光</span>
+                <span class="l-heart">睇见 睇见</span>
+                <span class="l-heart">睇见 睇见</span>
+                <span class="l-heart">心慌慌</span>
+
+                <span class="l-eye">她的眼光</span>
+                <span class="l-eye">她的眼光</span>
+                <span class="l-eye">好似好似星星发光</span>
+                <span class="l-heart">睇见 睇见</span>
+                <span class="l-heart">睇见 心更慌</span>
+
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+                <span class="l-moon">天际朗月也不愿看</span>
+            </div>
+
+            <div class="ghost-footer">
+                <span>🌕 风水 · 雷霆 · 糯米超级加倍</span>
+            </div>
+
+        </section>
+
+        <!-- ============================================================
+        页脚
+        ============================================================ -->
+        <footer class="site-footer">
+            <p>© 2026 六八班 · 仅供娱乐 · 如有雷霆 纯属糖入</p>
+        </footer>
+
+    </div>
+    <!-- /app -->
+</body>
+</html>

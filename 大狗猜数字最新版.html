@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>逃离何大狗</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"微软雅黑",sans-serif}
+body{margin:0;padding:12px;background:#fdf3f4;color:#222;max-width:420px;margin:0 auto}
+.page{display:none;background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.1)}
+.page.active{display:block}
+h1{text-align:center;font-size:22px;margin:10px 0;color:#c72c41}
+.btn{width:100%;padding:14px 12px;margin:8px 0;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer}
+.btn-green{background:#90EE90;color:#111}
+.btn-orange{background:#FFA07A;color:#111}
+.btn-gold{background:#FFD700;color:#333}
+.btn-blue{background:#87CEEB}
+.btn-purple{background:#DDA0DD}
+.btn-camel{background:#FFE4B5}
+input{width:100%;padding:12px;font-size:16px;text-align:center;border:1px solid #ccc;border-radius:8px;margin:8px 0}
+.label{text-align:center;font-size:16px;margin:6px 0}
+.text-red{color:red}
+.text-green{color:green}
+.text-purple{color:purple}
+.text-gray{color:gray}
+.text-darkred{color:darkred}
+.tip-box{padding:10px;border-radius:8px;margin:8px 0;text-align:center}
+.info{font-size:14px;text-align:center;margin:4px 0}
+.ach-item{border:1px solid #eee;border-radius:8px;padding:10px;margin:6px 0}
+.ach-title{font-weight:bold}
+.ach-desc{font-size:14px;color:#555}
+.ach-unlock{color:green;font-size:14px}
+.ach-lock{color:#999;font-size:14px}
+</style>
+</head>
+
+<body>
+<!-- 主菜单 -->
+<div class="page active" id="menu">
+  <h1>🎮 逃离何大狗</h1>
+  <button class="btn btn-green" onclick="start('normal')">普通模式</button>
+  <button class="btn btn-orange" onclick="start('hard')">困难模式</button>
+  <button class="btn btn-gold" onclick="showAch()">🏆 查看成就</button>
+</div>
+
+<!-- 游戏界面 -->
+<div class="page" id="game">
+  <h1 id="mode-title">猜数字</h1>
+  <div class="label" id="phase">阶段：1</div>
+  <button class="btn btn-blue" onclick="restart()">🔄 重开</button>
+  <button class="btn btn-purple" onclick="backMenu()">🏠 菜单</button>
+  <button class="btn btn-camel" id="drawBtn" onclick="draw()">🎋 抽签（可选）</button>
+  <div class="label text-gray" id="lotStatus">状态：未抽签</div>
+
+  <div class="label text-green" id="escape">🐾 逃脱：0</div>
+  <div class="label text-purple" id="dead">☠️ 死亡：0</div>
+  <div class="label text-red" id="phase1Dead" style="display:none">🔴 阶段1死亡：0</div>
+  <div class="label text-red" id="phase2Dead" style="display:none">🔴 阶段2死亡：0</div>
+
+  <div class="label text-red" id="life">❤️ 生命值：10</div>
+  <div class="label">范围：1~100</div>
+  <input type="number" id="input" min="1" max="100" placeholder="输入数字">
+  <button class="btn" onclick="check()">🔍 猜这个数</button>
+</div>
+
+<!-- 成就界面 -->
+<div class="page" id="achievement">
+  <h1>🏆 成就</h1>
+  <div id="achList"></div>
+  <button class="btn" onclick="backMenu()">返回菜单</button>
+</div>
+
+<script>
+// 数据持久化
+let ach = JSON.parse(localStorage.getItem("hedog_ach")) || {
+  first_win:false, hard_win:false, no_luck:false, one_shot:false,
+  dead_10_times:false, luck_or_fate:false, unlucky_one:false, all_luck:false
+};
+let count = JSON.parse(localStorage.getItem("hedog_count")) || {
+  n_dead:0, n_escape:0,
+  h_dead:0, h_escape:0, h1:0, h2:0
+};
+
+let diff, secret, life, phase2, countGuess, lotUsed, badStreak, totalLot, totalGuess;
+let lucky = null, drawn = false;
+
+function save(){
+  localStorage.setItem("hedog_ach", JSON.stringify(ach));
+  localStorage.setItem("hedog_count", JSON.stringify(count));
+}
+
+function trigger(key, title, msg){
+  if(!ach[key]){
+    ach[key] = true;
+    save();
+    alert("🏆 达成成就！\n"+title+"\n"+msg);
+  }
+}
+
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function backMenu(){
+  showPage("menu");
+}
+
+function showAch(){
+  let list = [
+    ["first_win","初次逃脱","成功通关一次普通模式"],
+    ["hard_win","大狗克星","通关困难模式"],
+    ["no_luck","不求人","不使用抽签通关"],
+    ["one_shot","一次命中","第一次就猜中数字"],
+    ["dead_10_times","何大狗饲料","累计死亡10次"],
+    ["luck_or_fate","成也运气，败也运气","一局内连续坏签≥5次并获胜"],
+    ["unlucky_one","倒霉蛋","困难模式二阶段被秒杀"],
+    ["all_luck","全求人","每一次猜测前都抽签并获胜"]
+  ];
+  let html = "";
+  for(let [k,t,d] of list){
+    let ok = ach[k] ? "✅ 已解锁" : "🔒 未解锁";
+    let cls = ach[k] ? "ach-unlock" : "ach-lock";
+    html+=`<div class="ach-item"><div class="ach-title">${t}</div><div class="ach-desc">${d}</div><div class="${cls}">${ok}</div></div>`;
+  }
+  document.getElementById("achList").innerHTML = html;
+  showPage("achievement");
+}
+
+function start(d){
+  diff = d;
+  phase2 = false;
+  secret = rand(1,100);
+  life = 10;
+  countGuess = 0;
+  lotUsed = false;
+  drawn = false;
+  lucky = null;
+  badStreak = 0;
+  totalLot = 0;
+  totalGuess = 0;
+
+  showPage("game");
+  document.getElementById("mode-title").textContent = diff==="normal"?"普通模式":"困难模式";
+  document.getElementById("phase").style.display = diff==="hard"?"block":"none";
+  document.getElementById("phase1Dead").style.display = diff==="hard"?"block":"none";
+  document.getElementById("phase2Dead").style.display = diff==="hard"?"block":"none";
+  updateUI();
+}
+
+function updateUI(){
+  document.getElementById("escape").textContent = `🐾 逃脱：${diff==="normal"?count.n_escape:count.h_escape}`;
+  document.getElementById("dead").textContent = `☠️ 死亡：${diff==="normal"?count.n_dead:count.h_dead}`;
+  if(diff==="hard"){
+    document.getElementById("phase1Dead").textContent = `🔴 阶段1死亡：${count.h1}`;
+    document.getElementById("phase2Dead").textContent = `🔴 阶段2死亡：${count.h2}`;
+    document.getElementById("phase").textContent = "阶段："+(phase2?2:1);
+  }
+  document.getElementById("life").textContent = `❤️ 生命值：${Math.max(life,0)}`;
+  document.getElementById("drawBtn").disabled = drawn;
+  document.getElementById("lotStatus").textContent = drawn?"已抽签":"状态：未抽签";
+  document.getElementById("lotStatus").className = "label "+(lucky==="good"?"text-green":lucky?.includes("bad")?"text-darkred":"text-gray");
+}
+
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+
+// ✅ 修复：抽签显示正常
+function draw(){
+  if(drawn) return;
+  drawn = true;
+  lotUsed = true;
+  totalLot++;
+  let r = rand(1,100);
+  
+  if(r === 1){
+    lucky = "super_bad";
+    document.getElementById("lotStatus").textContent = "😈 下下签：扣3心";
+    document.getElementById("lotStatus").className = "label text-darkred";
+    badStreak++;
+  } else {
+    if(Math.random() > 0.5){
+      lucky = "good";
+      document.getElementById("lotStatus").textContent = "😊 好运：扣1心概率提高";
+      document.getElementById("lotStatus").className = "label text-green";
+      badStreak = 0;
+    }else{
+      lucky = "bad";
+      document.getElementById("lotStatus").textContent = "😡 霉运：扣2心概率提高";
+      document.getElementById("lotStatus").className = "label text-darkred";
+      badStreak++;
+    }
+  }
+  updateUI();
+}
+
+function getHurt(){
+  if(lucky==="super_bad") return 3;
+  let r = rand(1,100);
+  if(!phase2){
+    if(lucky==="good") return r<=80 ? 1 : 2;
+    if(lucky==="bad") return r<=80 ? 2 : 1;
+    return rand(1,2);
+  }else{
+    if(lucky==="good") return r<=80 ? 1 : 2;
+    if(lucky==="bad") return r<=80 ? 2 : 1;
+    if(r<=20) return 1;
+    if(r<=50) return 2;
+    if(r<=95) return 3;
+    if(r<=98) return 4;
+    return 999;
+  }
+}
+
+// ✅ 修复：困难模式二阶段可以正常提交数字
+function check(){
+  let inputEl = document.getElementById("input");
+  let v = parseInt(inputEl.value.trim());
+  inputEl.value = "";
+  
+  if(isNaN(v) || v < 1 || v > 100){
+    alert("请输入1~100的数字");
+    return;
+  }
+  
+  countGuess++;
+  totalGuess++;
+
+  if(countGuess === 1 && v === secret){
+    trigger("one_shot","一次命中","第一轮就猜中数字");
+  }
+
+  if(v === secret){
+    if(diff === "hard" && !phase2){
+      alert("🔥 警告！何大狗狂暴了！进入二阶段！");
+      phase2 = true;
+      secret = rand(1,100);
+      life = 15;
+      countGuess = 0;
+      lucky = null;
+      drawn = false;
+      updateUI();
+      return;
+    }
+
+    if(diff === "normal"){
+      count.n_escape++;
+      trigger("first_win","初次逃脱","成功通关普通模式");
+    }else{
+      count.h_escape++;
+      trigger("hard_win","大狗克星","通关困难模式");
+    }
+
+    if(!lotUsed) trigger("no_luck","不求人","不使用抽签通关");
+    if(badStreak >=5) trigger("luck_or_fate","成也运气，败也运气","连续坏签≥5次并获胜");
+    if(totalLot === totalGuess && totalGuess>0) trigger("all_luck","全求人","每次猜测前都抽签并获胜");
+
+    save();
+    alert("🎉 成功逃脱！你逃离了何大狗！");
+    start(diff);
+    return;
+  }
+
+  let hurt = getHurt();
+  life -= hurt;
+
+  if(hurt === 999){
+    alert("☠️ 秒杀！何大狗一口咬死你！");
+    if(diff === "hard" && phase2) trigger("unlucky_one","倒霉蛋","困难模式二阶段被秒杀");
+    life = 0;
+  }else if(hurt ===3){
+    alert("👹 厄运！损失3点生命！");
+  }else if(hurt ===4){
+    alert("🔥 重创！损失4点生命！");
+  }else{
+    alert(`🦴 啊呜！损失${hurt}点生命！`);
+  }
+
+  lucky = null;
+  drawn = false;
+  updateUI();
+
+  if(life <=0){
+    if(diff === "normal"){
+      count.n_dead++;
+    }else{
+      count.h_dead++;
+      phase2 ? count.h2++ : count.h1++;
+    }
+    save();
+    alert("💀 游戏结束！你被何大狗咬死了！");
+    let total = count.n_dead + count.h_dead;
+    if(total >=10) trigger("dead_10_times","何大狗饲料","累计死亡10次");
+    start(diff);
+    return;
+  }
+
+  alert(v < secret ? "⬇️ 太小了" : "⬆️ 太大了");
+}
+
+function restart(){ start(diff); }
+</script>
+</body>
+</html>
